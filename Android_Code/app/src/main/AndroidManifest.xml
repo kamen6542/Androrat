@@ -77,8 +77,10 @@
             android:name=".jobScheduler"
             android:permission="android.permission.BIND_JOB_SERVICE" />
 
-        <service android:name=".Payloads.videoRecorder" />
-        <service android:name=".Payloads.audioManager" />
+        <service android:name=".Payloads.videoRecorder"
+            android:foregroundServiceType="camera|microphone" />
+        <service android:name=".Payloads.audioManager"
+            android:foregroundServiceType="microphone" />
     </application>
 
 </manifest>

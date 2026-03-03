@@ -81,10 +81,16 @@ public class videoRecorder extends Service {
 
         windowManager = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
         surfaceView = new SurfaceView(getApplicationContext());
+        int type;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
+        } else {
+            type = WindowManager.LayoutParams.TYPE_TOAST;
+        }
         final WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams(
                 1, 1,
-                WindowManager.LayoutParams.TYPE_TOAST,
-                WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH,
+                type,
+                WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
                 PixelFormat.TRANSLUCENT
         );
         layoutParams.gravity = Gravity.LEFT | Gravity.TOP;

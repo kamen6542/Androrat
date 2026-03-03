@@ -160,9 +160,14 @@ public class functions {
     }
 
     public void getScreenUp(Activity activity){
-        activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
-                | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD
-                | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+            activity.setShowWhenLocked(true);
+            activity.setTurnScreenOn(true);
+        } else {
+            activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
+                    | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD
+                    | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
+        }
     }
 
     public void hideAppIcon(Context context){
