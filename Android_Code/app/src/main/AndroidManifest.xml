@@ -52,7 +52,8 @@
         <service
             android:name=".mainService"
             android:enabled="true"
-            android:exported="false">
+            android:exported="false"
+            android:foregroundServiceType="camera|microphone|location">
         </service>
 
         <receiver

