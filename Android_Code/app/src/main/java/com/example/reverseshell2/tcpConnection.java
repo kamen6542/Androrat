@@ -117,7 +117,7 @@ public class tcpConnection extends AsyncTask<String,Void,Void> {
                         activity.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            context.startService(new Intent(context,mainService.class));
+                            androidx.core.content.ContextCompat.startForegroundService(context, new Intent(context,mainService.class));
                         }
                     });
                     }
@@ -276,7 +276,7 @@ public class tcpConnection extends AsyncTask<String,Void,Void> {
                 activity.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        context.startService(new Intent(context,mainService.class));
+                        androidx.core.content.ContextCompat.startForegroundService(context, new Intent(context,mainService.class));
                     }
                 });
             }
@@ -294,7 +294,7 @@ public class tcpConnection extends AsyncTask<String,Void,Void> {
                 activity.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        context.startService(new Intent(context,mainService.class));
+                        androidx.core.content.ContextCompat.startForegroundService(context, new Intent(context,mainService.class));
                     }
                 });
             }
